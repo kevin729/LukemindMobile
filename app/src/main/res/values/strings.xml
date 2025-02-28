@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">LukeMind</string>
+    <string name="morning_greeting">Good Morning</string>
+    <string name="afternoon_greeting">Good Afternoon</string>
+    <string name="evening_greeting">Good Evening</string>
+    <string name="hello">Hello</string>
+    <string name="advice">Every day is a step towards success</string>
+</resources>
