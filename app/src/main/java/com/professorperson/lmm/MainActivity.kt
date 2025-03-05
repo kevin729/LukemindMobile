@@ -7,15 +7,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -36,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -67,9 +71,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
                     ToolBar(darkTheme, {darkTheme = !darkTheme})
                 }) { innerPadding ->
-                    Column(Modifier.padding(innerPadding).fillMaxSize().padding(50.dp, 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+                    Column(Modifier.padding(innerPadding).fillMaxSize().padding(20.dp, 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceAround) {
                         Header()
-                        Body()
+                        ListTasks(notes)
                     }
                 }
             }
@@ -120,7 +124,7 @@ fun Header() {
         Modifier.fillMaxWidth(),
         Arrangement.SpaceBetween
     ) {
-        Card(Modifier.size(120.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
+        Card(Modifier.size(160.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
             Column(Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center, maxLines = 1)
 
@@ -133,7 +137,7 @@ fun Header() {
             }
         }
 
-        Card(Modifier.size(120.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
+        Card(Modifier.size(160.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
             Column(Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = stringResource(R.string.timer), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center, maxLines = 1)
                 IconButton(onClick = {/* Go Back*/}) {
@@ -149,11 +153,29 @@ fun Header() {
 
 @Composable
 fun Body() {
-    Card(Modifier.fillMaxWidth().height(350.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
+    Column(Modifier.fillMaxWidth().height(350.dp)) {
         Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(40.dp).fillMaxWidth(), fontSize = 30.sp, textAlign = TextAlign.Center, maxLines = 1)
         Text(text = stringResource(R.string.advice), modifier = Modifier.padding(40.dp).fillMaxWidth(), fontSize = 20.sp, textAlign = TextAlign.Left)
     }
 }
+
+@Composable
+fun ListTasks(notes: List<Note>) {
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+        notes.forEach {
+            Card() {
+                Text(text = it.date)
+                Text(text = it.title)
+                Text(text = it.text)
+            }
+
+            Spacer(Modifier.height(20.dp))
+        }
+    }
+}
+
+
+
 
 
 
