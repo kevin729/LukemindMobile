@@ -1,16 +1,19 @@
 package com.professorperson.lmm
 
 
+import android.content.res.Resources
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -41,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.professorperson.lmm.models.Note
 import com.professorperson.lmm.ui.theme.LMMTheme
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import kotlin.math.max
 
 
 class MainActivity : ComponentActivity() {
@@ -51,8 +55,6 @@ class MainActivity : ComponentActivity() {
     )
 
     data class DarkTheme(val isDark: Boolean = false)
-
-    val LocalTheme = compositionLocalOf { DarkTheme() }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,14 +67,19 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
                     ToolBar(darkTheme, {darkTheme = !darkTheme})
                 }) { innerPadding ->
-                        Column(Modifier.padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                            Header()
-                            Body()
-                        }
+                    Column(Modifier.padding(innerPadding).fillMaxSize().padding(50.dp, 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+                        Header()
+                        Body()
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+fun Title(title: String) {
+    Text(fontSize = 40.sp, text = title)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,26 +117,40 @@ fun ToolBar(darkTheme: Boolean, callback: () -> Unit) {
 @Composable
 fun Header() {
     Row(
-        Modifier.fillMaxWidth()
+        Modifier.fillMaxWidth(),
+        Arrangement.SpaceBetween
     ) {
-            Card(Modifier.size(150.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
+        Card(Modifier.size(120.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
+            Column(Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center, maxLines = 1)
-                Text(text = stringResource(R.string.advice), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 12.sp, textAlign = TextAlign.Justify)
+
+                IconButton(onClick = {/* Go Back*/}) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
             }
+        }
 
-
-
-        Card(Modifier.size(150.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
-            Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center, maxLines = 1)
-            Text(text = stringResource(R.string.advice), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 12.sp, textAlign = TextAlign.Justify)
+        Card(Modifier.size(120.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
+            Column(Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = stringResource(R.string.timer), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center, maxLines = 1)
+                IconButton(onClick = {/* Go Back*/}) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_cog),
+                        contentDescription = "Cog"
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 fun Body() {
-    Card(Modifier.size(300.dp, 300.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
-        Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(40.dp).fillMaxWidth(), fontSize = 40.sp, textAlign = TextAlign.Center)
+    Card(Modifier.fillMaxWidth().height(350.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
+        Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(40.dp).fillMaxWidth(), fontSize = 30.sp, textAlign = TextAlign.Center, maxLines = 1)
         Text(text = stringResource(R.string.advice), modifier = Modifier.padding(40.dp).fillMaxWidth(), fontSize = 20.sp, textAlign = TextAlign.Left)
     }
 }

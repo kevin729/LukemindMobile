@@ -5,4 +5,6 @@
     <string name="evening_greeting">Good Evening</string>
     <string name="hello">Hello</string>
     <string name="advice">Every day is a step towards success</string>
+    <string name="timer">Timer</string>
+    <string name="notes">Notes</string>
 </resources>
