@@ -15,4 +15,5 @@ data class Note (
     @ColumnInfo(name = "date") val date: String
 ) {
     constructor(): this(null, "", "", SimpleDateFormat("dd MMMM yyyy - HH:mm:ss", Locale.UK).format(Date()))
+    constructor(title: String, text: String): this(null, title, text, SimpleDateFormat("dd MMMM yyyy - HH:mm:ss", Locale.UK).format(Date()))
 }

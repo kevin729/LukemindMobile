@@ -1,25 +1,23 @@
 package com.professorperson.lmm
 
 
-import android.content.res.Resources
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -33,14 +31,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -50,28 +46,23 @@ import androidx.room.Room
 import com.professorperson.lmm.models.Note
 import com.professorperson.lmm.models.database.LMDatabase
 import com.professorperson.lmm.ui.theme.LMMTheme
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
-import kotlin.math.max
 
 
 class MainActivity : ComponentActivity() {
 
-    val notes = listOf(
-        Note(),
-        Note()
-    )
-
-    val lmdb = Room.databaseBuilder(
-        applicationContext,
-        LMDatabase::class.java, "database-nam"
-    ).build()
-
-    data class DarkTheme(val isDark: Boolean = false)
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val lmdb = Room.databaseBuilder(
+            applicationContext,
+            LMDatabase::class.java, "lukemindDB"
+        ).build()
+
+        Thread() {
+            lmdb.noteDAO().deleteAll()
+        }.start()
+
 
         setContent {
             var darkTheme by remember { mutableStateOf(true) }
@@ -85,17 +76,12 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(20.dp, 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceAround) {
                         Header()
-                        ListTasks(notes, lmdb)
+                        ListTasks(lmdb)
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun Title(title: String) {
-    Text(fontSize = 40.sp, text = title)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,7 +131,7 @@ fun Header() {
                 IconButton(onClick = {/* Go Back*/}) {
                     Icon(
                         painter = painterResource(R.drawable.ic_cog),
-                        contentDescription = "Back"
+                        contentDescription = "notes"
                     )
                 }
             }
@@ -168,26 +154,45 @@ fun Header() {
 }
 
 @Composable
-fun ListTasks(notes: List<Note>, lmdb: LMDatabase) {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+fun ListTasks(lmdb: LMDatabase) {
+    var noteList = emptyList<Note>()
+    val thread = Thread {
+        noteList = lmdb.noteDAO().getAll()
+    }
+    thread.start()
+    thread.join()
 
-        lmdb.userDao().getAll().forEach {
-            Card() {
-                Text(text = it.date)
-                Text(text = it.title)
-                Text(text = it.text)
+    var notes by remember {
+        mutableStateOf(noteList)
+    }
+
+    Column(Modifier.fillMaxWidth().fillMaxHeight(0.8f).background(MaterialTheme.colorScheme.tertiary), horizontalAlignment = Alignment.End) {
+        Column(Modifier.fillMaxHeight(0.5f).verticalScroll(rememberScrollState())) {
+            notes.forEach() {
+                Card() {
+                    Text(text = it.date)
+                    Text(text = it.title)
+                    Text(text = it.text)
+                }
+
+                Spacer(Modifier.height(20.dp))
             }
-
-            Spacer(Modifier.height(20.dp))
         }
 
-        IconButton(onClick = {lmdb.userDao().insert(Note())}) {
+        IconButton(onClick = {
+            val thread = Thread {
+                lmdb.noteDAO().insert(Note("Testtitle", "TestText"))
+                notes = lmdb.noteDAO().getAll()
+            }
+
+            thread.start()
+
+        }) {
             Icon(
                 painter = painterResource(R.drawable.ic_cog),
                 contentDescription = "Cog"
             )
         }
-
     }
 }
 

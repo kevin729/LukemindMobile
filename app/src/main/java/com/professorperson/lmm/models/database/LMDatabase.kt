@@ -7,5 +7,5 @@ import com.professorperson.lmm.models.Note
 
 @Database(entities = [Note::class], version = 1)
 abstract class LMDatabase : RoomDatabase() {
-    abstract fun userDao() : NoteDao
+    abstract fun noteDAO() : NoteDao
 }
