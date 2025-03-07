@@ -3,6 +3,7 @@ package com.professorperson.lmm
 
 import android.content.res.Resources
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -45,7 +46,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.room.Room
 import com.professorperson.lmm.models.Note
+import com.professorperson.lmm.models.database.LMDatabase
 import com.professorperson.lmm.ui.theme.LMMTheme
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.math.max
@@ -54,9 +57,14 @@ import kotlin.math.max
 class MainActivity : ComponentActivity() {
 
     val notes = listOf(
-        Note("NI number", "123456"),
-        Note("Clothes", "Sheer tops")
+        Note(),
+        Note()
     )
+
+    val lmdb = Room.databaseBuilder(
+        applicationContext,
+        LMDatabase::class.java, "database-nam"
+    ).build()
 
     data class DarkTheme(val isDark: Boolean = false)
 
@@ -71,9 +79,13 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
                     ToolBar(darkTheme, {darkTheme = !darkTheme})
                 }) { innerPadding ->
-                    Column(Modifier.padding(innerPadding).fillMaxSize().padding(20.dp, 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceAround) {
+                    Column(
+                        Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .padding(20.dp, 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceAround) {
                         Header()
-                        ListTasks(notes)
+                        ListTasks(notes, lmdb)
                     }
                 }
             }
@@ -126,11 +138,13 @@ fun Header() {
     ) {
         Card(Modifier.size(160.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
             Column(Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center, maxLines = 1)
+                Text(text = stringResource(R.string.morning_greeting), modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center, maxLines = 1)
 
                 IconButton(onClick = {/* Go Back*/}) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        painter = painterResource(R.drawable.ic_cog),
                         contentDescription = "Back"
                     )
                 }
@@ -139,7 +153,9 @@ fun Header() {
 
         Card(Modifier.size(160.dp, 120.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.tertiary)) {
             Column(Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = stringResource(R.string.timer), modifier = Modifier.padding(10.dp).fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center, maxLines = 1)
+                Text(text = stringResource(R.string.timer), modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center, maxLines = 1)
                 IconButton(onClick = {/* Go Back*/}) {
                     Icon(
                         painter = painterResource(R.drawable.ic_cog),
@@ -152,17 +168,10 @@ fun Header() {
 }
 
 @Composable
-fun Body() {
-    Column(Modifier.fillMaxWidth().height(350.dp)) {
-        Text(text = stringResource(R.string.morning_greeting), modifier = Modifier.padding(40.dp).fillMaxWidth(), fontSize = 30.sp, textAlign = TextAlign.Center, maxLines = 1)
-        Text(text = stringResource(R.string.advice), modifier = Modifier.padding(40.dp).fillMaxWidth(), fontSize = 20.sp, textAlign = TextAlign.Left)
-    }
-}
-
-@Composable
-fun ListTasks(notes: List<Note>) {
+fun ListTasks(notes: List<Note>, lmdb: LMDatabase) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-        notes.forEach {
+
+        lmdb.userDao().getAll().forEach {
             Card() {
                 Text(text = it.date)
                 Text(text = it.title)
@@ -171,6 +180,14 @@ fun ListTasks(notes: List<Note>) {
 
             Spacer(Modifier.height(20.dp))
         }
+
+        IconButton(onClick = {lmdb.userDao().insert(Note())}) {
+            Icon(
+                painter = painterResource(R.drawable.ic_cog),
+                contentDescription = "Cog"
+            )
+        }
+
     }
 }
 
